@@ -43,6 +43,7 @@ public class UserOpenHelper extends SQLiteOpenHelper{
      */
     @Override
     public void onCreate(SQLiteDatabase db) {
+
         db.execSQL(DATABASE_CREATE);
     }
 
