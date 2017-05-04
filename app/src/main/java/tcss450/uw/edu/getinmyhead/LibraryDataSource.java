@@ -65,11 +65,10 @@ public class LibraryDataSource {
         LibItem mLibItem = cursorToLibItem(cursor);
         cursor.close();
         return mLibItem;
-        
     }
 
-    /** Deletes a User from the Database
-     *
+    /**
+     *  Deletes a LibItem from the Database
      * @param mLibItem
      */
     public void deleteLibItem(LibItem mLibItem) {

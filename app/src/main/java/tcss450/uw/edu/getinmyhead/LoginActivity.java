@@ -341,6 +341,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mAuthTask = null;
             showProgress(false);
             //if username is correct and password is correct go into library database activity.
+            //TODO change to up Main MENU UI
             if (success) {
                 Intent i = new Intent(LoginActivity.this, LibraryDatabaseActivity.class);
                 startActivity(i);

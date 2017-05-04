@@ -35,19 +35,31 @@ public class LibraryDatabaseActivity extends ListActivity {
         ListView listView = getListView();
         listView.setTextFilterEnabled(true);
 
+        //short tap
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
                 //TODO add logic so it opens the file when the listitem is clicked on.
-
                 Toast.makeText(getApplicationContext(),
-                        ((TextView) view).getText(), Toast.LENGTH_SHORT).show();
+                        "short click", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        //long tap
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                //TODO add logic so a dialog window pops up to (delete, edit or something) on long click on listitem.
+                Toast.makeText(getApplicationContext(), "Long click",
+                        Toast.LENGTH_SHORT).show();
+                return true;
             }
         });
     }
 
     // Will be called via the onClick attribute
     // of the buttons in main.xml
+    //TODO this is a placeholder function.
     public void onClick(View view) {
         @SuppressWarnings("unchecked")
         ArrayAdapter<LibItem> adapter = (ArrayAdapter<LibItem>) getListAdapter();
@@ -63,7 +75,7 @@ public class LibraryDatabaseActivity extends ListActivity {
                 break;
             case R.id.delete_libitem:
                 if (getListAdapter().getCount() > 0) {
-                    libItem = (LibItem) getListAdapter().getItem(0); // this is determing what is getting deleted.
+                    libItem = (LibItem) getListAdapter().getItem(0); // this is determining what is getting deleted.
                     datasource.deleteLibItem(libItem);
                     adapter.remove(libItem);
                 }
