@@ -14,26 +14,25 @@ import android.util.Log;
  * Several Android functions rely on this standard.
  */
 
-public class UserOpenHelper extends SQLiteOpenHelper{
+public class LibraryOpenHelper extends SQLiteOpenHelper{
 
-    public static final String TABLE_USER = "users";  //table name
-    public static final String COLUMN_USER_ID = "_id";
-    public static final String COLUMN_USER_NAME = "username";
-    public static final String COLUMN_PASSWORD = "password";
+    public static final String TABLE_LIBRARY = "library";  //table name
+    public static final String COLUMN_LIB_ITEM_ID = "_id";
+    public static final String COLUMN_LIB_ITEM_NAME = "item_name";
+    public static final String COLUMN_LIB_ITEM_LAST_SETTING = "last_setting";
 
-    private static final String DATABASE_NAME = "userinfo.db";
+    private static final String DATABASE_NAME = "LibraryOfText.db";
     private static final int DATABASE_VERSION = 1;
 
     /* DataBase creating sql statement */
-    private static final String DATABASE_CREATE ="create table " + TABLE_USER + "( " +
-            COLUMN_USER_ID + " integer primary key autoincrement, " +
-            COLUMN_USER_NAME + " text not null," +
-            COLUMN_USER_NAME + " text not null," +
-            COLUMN_PASSWORD + " text not null" +
+    private static final String DATABASE_CREATE ="create table " + TABLE_LIBRARY + "( " +
+            COLUMN_LIB_ITEM_ID + " INTEGER primary key autoincrement, " +
+            COLUMN_LIB_ITEM_NAME + " TEXT not null," +
+            COLUMN_LIB_ITEM_LAST_SETTING + " INTEGER" +
             " );";
 
     //constructor
-    public UserOpenHelper(Context context) {
+    public LibraryOpenHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -57,10 +56,10 @@ public class UserOpenHelper extends SQLiteOpenHelper{
      */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Log.w(UserOpenHelper.class.getName(),
+        Log.w(LibraryOpenHelper.class.getName(),
                 "Upgrading database from version " + oldVersion + " to "
                         + newVersion + ", which will destroy all old data");
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_LIBRARY);
         onCreate(db);
     }
 }

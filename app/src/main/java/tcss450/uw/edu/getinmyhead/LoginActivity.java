@@ -3,6 +3,7 @@ package tcss450.uw.edu.getinmyhead;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -59,7 +60,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     /** User Data Acess Object
      *
      */
-    private UserDataSource dataSource;
+
 
     // UI references.
     private AutoCompleteTextView mEmailView;
@@ -72,8 +73,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        dataSource = new UserDataSource(this);
-        dataSource.open();
+
 
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
@@ -340,9 +340,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
             showProgress(false);
-
+            //if username is correct and password is correct go into library database activity.
             if (success) {
-                finish();
+                Intent i = new Intent(LoginActivity.this, LibraryDatabaseActivity.class);
+                startActivity(i);
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
