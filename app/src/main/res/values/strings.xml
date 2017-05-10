@@ -11,6 +11,7 @@
     <string name="error_in_url">Something wrong with the url</string>
     <string name="error_unknown">An unknown error has occurred</string>
     <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_incorrect_email">This email address was not found</string>
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
