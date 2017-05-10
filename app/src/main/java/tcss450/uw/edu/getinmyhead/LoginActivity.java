@@ -20,6 +20,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -29,7 +30,14 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,8 +65,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      */
     private UserLoginTask mAuthTask = null;
 
-    /** User Data Acess Object
-     *
+    /**
+     * User Data Acess Object
      */
 
 
@@ -72,7 +80,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
 
 
         // Set up the login form.
@@ -307,6 +314,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         private final String mEmail;
         private final String mPassword;
+        private String errorType = "";
+        final String COURSE_ADD_URL
+
+                = "http://cssgate.insttech.washington.edu/~hindsr/Android/login.php?";
 
         UserLoginTask(String email, String password) {
             mEmail = email;
@@ -315,25 +326,22 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         @Override
         protected Boolean doInBackground(Void... params) {
+            Boolean result = false;
             // TODO: attempt authentication against a network service.
-
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
+          // String loginStr = ;
+            if(doUserLogin(buildCourseURL()).contains("success")){
+                result = true;
             }
+            else{
+                errorType = doUserLogin(buildCourseURL());
+                // TODO: register the new account here. if new account made return true else return false.
 
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
+ /*               if(){
+
+                    result = true;
+                }*/
             }
-
-            // TODO: register the new account here.
-            return true;
+            return result;
         }
 
         @Override
@@ -342,12 +350,29 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
             //if username is correct and password is correct go into library database activity.
             //TODO change to up Main MENU UI
-            if (success) {
+            if(success){
                 Intent i = new Intent(LoginActivity.this, LibraryDatabaseActivity.class);
                 startActivity(i);
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
+            }else{
+                    if(errorType.contains("email")) {
+                        errorType = getString(R.string.error_invalid_email);
+                        mEmailView.setError(errorType);
+                        mEmailView.requestFocus();
+
+                    }else if(errorType.contains("password")){
+                        errorType = getString(R.string.error_incorrect_password);
+                        mPasswordView.setError(errorType);
+                        mPasswordView.requestFocus();
+
+                    }else if(errorType.contains("Something")){
+                        errorType = getString(R.string.error_in_url);
+                        Toast.makeText(getApplicationContext(),R.string.error_in_url , Toast.LENGTH_LONG).show();
+
+                    }else{
+                        errorType = getString(R.string.error_unknown);
+                        mEmailView.setError(errorType);
+                        mEmailView.requestFocus();
+                    }
             }
         }
 
@@ -356,6 +381,51 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mAuthTask = null;
             showProgress(false);
         }
-    }
-}
 
+        private String buildCourseURL() {
+            StringBuilder sb = new StringBuilder(COURSE_ADD_URL);
+
+            try {
+
+                sb.append("&email=");
+                sb.append(URLEncoder.encode(this.mEmail, "UTF-8"));
+
+                sb.append("&password=");
+                sb.append(URLEncoder.encode(this.mPassword, "UTF-8"));
+
+                Log.i("login url", sb.toString());
+
+            } catch (Exception e) {
+               return getString(R.string.error_in_url) + e.getMessage();
+            }
+            return sb.toString();
+        }
+        protected String doUserLogin(String... urls) {
+            String response = "";
+            HttpURLConnection urlConnection = null;
+            for (String url : urls) {
+                try {
+                    URL urlObject = new URL(url);
+                    urlConnection = (HttpURLConnection) urlObject.openConnection();
+
+                    InputStream content = urlConnection.getInputStream();
+
+                    BufferedReader buffer = new BufferedReader(new InputStreamReader(content));
+                    String s = "";
+                    while ((s = buffer.readLine()) != null) {
+                        response += s;
+                    }
+
+                } catch (Exception e) {
+                    response = "Unable to add course, Reason: "
+                            + e.getMessage();
+                } finally {
+                    if (urlConnection != null)
+                        urlConnection.disconnect();
+                }
+            }
+            return response;
+        }
+    }
+
+}
