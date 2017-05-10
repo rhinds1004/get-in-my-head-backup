@@ -13,7 +13,7 @@
             android:id="@+id/add_libitem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Add New"
+            android:text="@string/add_new"
             android:onClick="onClick"/>
 
         <Button
