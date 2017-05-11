@@ -11,6 +11,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.app.LoaderManager.LoaderCallbacks;
 
@@ -36,6 +38,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -54,7 +59,7 @@ import static android.Manifest.permission.READ_CONTACTS;
  * @author Menaka Abraham
  * @version 1.0
  */
-public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
+public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor>{
 
     /**
      * Id to identity READ_CONTACTS permission request.
@@ -200,6 +205,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(true);
             mAuthTask = new UserLoginTask(email, password);
             mAuthTask.execute((Void) null);
+
         }
     }
 
@@ -316,6 +322,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         private String errorType = "";
         //location of the remote server
         final String LOGIN_URL = "http://cssgate.insttech.washington.edu/~hindsr/Android/login.php?";
+        final String ADD_USER_URL = "http://cssgate.insttech.washington.edu/~hindsr/Android/adduser.php?";
 
         UserLoginTask(String email, String password) {
             mEmail = email;
@@ -331,18 +338,18 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         @Override
         protected Boolean doInBackground(Void... params) {
             Boolean result = false;
-            if(doUserLogin(buildLoginURL()).contains("success")){
+            errorType = doUserLogin(buildLoginURL(LOGIN_URL));
+            if(errorType.contains("success")){
                 result = true;
             }
             else{
-                errorType = doUserLogin(buildLoginURL());
-                // TODO: register the new account here. if new account made return true else return false.
+                if(errorType.contains("email")){
+                    if(addUser(buildLoginURL(ADD_USER_URL)).contains("success")){
+                        result = true;
+                    }
+                }
+               }
 
- /*               if(){
-
-                    result = true;
-                }*/
-            }
             return result;
         }
 
@@ -361,7 +368,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             //if username is correct and password is correct go into library database activity.
             //TODO change to up Main MENU UI
             if(success){
+
                 Intent i = new Intent(LoginActivity.this, LibraryDatabaseActivity.class);
+                i.putExtra(getString(R.string.user_email), this.mEmail);
+                i.putExtra(getString(R.string.user_password), this.mPassword);
                 startActivity(i);
             }else{
                     if(errorType.contains("email")) {
@@ -383,6 +393,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         mEmailView.setError(errorType);
                         mEmailView.requestFocus();
                     }
+
             }
         }
 
@@ -397,8 +408,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
          * @return http login url on successful string creation or error string if unsuccessful
          * @author Robert Hinds
          */
-        private String buildLoginURL() {
-            StringBuilder sb = new StringBuilder(LOGIN_URL);
+        private String buildLoginURL(String URL) {
+            StringBuilder sb = new StringBuilder(URL);
 
             try {
 
@@ -449,6 +460,97 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
             return response;
         }
+
     }
 
+    /**
+     * Method to add a user to the remote database
+     * @param url http url string
+     * @return result of the add user task
+     */
+    private String addUser(String url) {
+        AddUserTask task = new AddUserTask();
+        task.execute(new String[]{url.toString()});
+        String result = "success";
+       // task.getStatus();
+/*        try {
+           result = task.get();
+        }catch(Exception e){
+
+        }*/
+        return result;
+    }
+
+    /**
+     * Represents an asynchronous add user to the remote database task
+     * @author Robert Hinds
+     * @version 1.0
+     */
+    private class AddUserTask extends AsyncTask<String, Void, String> {
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(String... urls) {
+            String response = "";
+            HttpURLConnection urlConnection = null;
+            for (String url : urls) {
+                try {
+                    URL urlObject = new URL(url);
+                    urlConnection = (HttpURLConnection) urlObject.openConnection();
+
+                    InputStream content = urlConnection.getInputStream();
+
+                    BufferedReader buffer = new BufferedReader(new InputStreamReader(content));
+                    String s = "";
+                    while ((s = buffer.readLine()) != null) {
+                        response += s;
+                    }
+
+                } catch (Exception e) {
+                    response = "Unable to add user, Reason: "
+                            + e.getMessage();
+                } finally {
+                    if (urlConnection != null)
+                        urlConnection.disconnect();
+                }
+            }
+            return response;
+        }
+
+
+        /**
+         * It checks to see if there was a problem with the URL(Network) which is when an
+         * exception is caught. It tries to call the parse Method and checks to see if it was successful.
+         * If not, it displays the exception.
+         *
+         * @param result
+         */
+        @Override
+        protected void onPostExecute(String result) {
+            // Something wrong with the network or the URL.
+            showProgress(false);
+            try {
+                JSONObject jsonObject = new JSONObject(result);
+                String status = (String) jsonObject.get("result");
+                if (status.equals("success")) {
+                    Toast.makeText(getApplicationContext(), "User successfully added!"
+                            , Toast.LENGTH_LONG)
+                            .show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Failed to add: "
+                                    + jsonObject.get("error")
+                            , Toast.LENGTH_LONG)
+                            .show();
+                }
+            } catch (JSONException e) {
+                Toast.makeText(getApplicationContext(), "Something wrong with the data" +
+                        e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        }
+    }
 }
