@@ -55,11 +55,12 @@ import static android.Manifest.permission.READ_CONTACTS;
 /**
  * A login screen that offers login via email/password. Uses Google login activity as base code.
  * Also uses methods by Menaka Abraham.
+ *
  * @author Robert Hinds
  * @author Menaka Abraham
  * @version 1.0
  */
-public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor>{
+public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
     /**
      * Id to identity READ_CONTACTS permission request.
@@ -312,6 +313,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     /**
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
+     *
      * @author Robert Hinds
      * @version 1.0
      */
@@ -331,6 +333,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         /**
          * Checks to if user login attempt is valid by connecting to remote host.
+         *
          * @param params
          * @return the result of the login attempt
          * @author Robert Hinds
@@ -339,16 +342,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         protected Boolean doInBackground(Void... params) {
             Boolean result = false;
             errorType = doUserLogin(buildLoginURL(LOGIN_URL));
-            if(errorType.contains("success")){
+            if (errorType.contains("success")) {
                 result = true;
-            }
-            else{
-                if(errorType.contains("email")){
-                    if(addUser(buildLoginURL(ADD_USER_URL)).contains("success")){
+            } else {
+                if (errorType.contains("email")) {
+                    if (addUser(buildLoginURL(ADD_USER_URL)).contains("success")) {
                         result = true;
                     }
                 }
-               }
+            }
 
             return result;
         }
@@ -358,6 +360,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
          * which part of the login attempt failed. Depending on which part of the login attempt
          * failed, the appropriate error string is set and reqestfocus() is set on the view item
          * that failed during the login attempt.
+         *
          * @param success the result of the login attempt
          * @author Robert Hinds
          */
@@ -367,32 +370,32 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
             //if username is correct and password is correct go into library database activity.
             //TODO change to up Main MENU UI
-            if(success){
+            if (success) {
 
                 Intent i = new Intent(LoginActivity.this, LibraryDatabaseActivity.class);
                 i.putExtra(getString(R.string.user_email), this.mEmail);
                 i.putExtra(getString(R.string.user_password), this.mPassword);
                 startActivity(i);
-            }else{
-                    if(errorType.contains("email")) {
-                        errorType = getString(R.string.error_incorrect_email);
-                        mEmailView.setError(errorType);
-                        mEmailView.requestFocus();
+            } else {
+                if (errorType.contains("email")) {
+                    errorType = getString(R.string.error_incorrect_email);
+                    mEmailView.setError(errorType);
+                    mEmailView.requestFocus();
 
-                    }else if(errorType.contains("password")){
-                        errorType = getString(R.string.error_incorrect_password);
-                        mPasswordView.setError(errorType);
-                        mPasswordView.requestFocus();
+                } else if (errorType.contains("password")) {
+                    errorType = getString(R.string.error_incorrect_password);
+                    mPasswordView.setError(errorType);
+                    mPasswordView.requestFocus();
 
-                    }else if(errorType.contains("Something")){
-                        errorType = getString(R.string.error_in_url);
-                        Toast.makeText(getApplicationContext(),R.string.error_in_url , Toast.LENGTH_LONG).show();
+                } else if (errorType.contains("Something")) {
+                    errorType = getString(R.string.error_in_url);
+                    Toast.makeText(getApplicationContext(), R.string.error_in_url, Toast.LENGTH_LONG).show();
 
-                    }else{
-                        errorType = getString(R.string.error_unknown);
-                        mEmailView.setError(errorType);
-                        mEmailView.requestFocus();
-                    }
+                } else {
+                    errorType = getString(R.string.error_unknown);
+                    mEmailView.setError(errorType);
+                    mEmailView.requestFocus();
+                }
 
             }
         }
@@ -405,6 +408,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         /**
          * This method builds a http url string
+         *
          * @return http login url on successful string creation or error string if unsuccessful
          * @author Robert Hinds
          */
@@ -422,13 +426,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 Log.i("login url", sb.toString());
 
             } catch (Exception e) {
-               return getString(R.string.error_in_url) + e.getMessage();
+                return getString(R.string.error_in_url) + e.getMessage();
             }
             return sb.toString();
         }
 
         /**
          * This method uses http url string to authenticate a user on a remote server.
+         *
          * @param urls
          * @return an empty string on successful login and error message string on unsuccessful
          * login
@@ -465,6 +470,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     /**
      * Method to add a user to the remote database
+     *
      * @param url http url string
      * @return result of the add user task
      */
@@ -472,7 +478,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         AddUserTask task = new AddUserTask();
         task.execute(new String[]{url.toString()});
         String result = "success";
-       // task.getStatus();
+        //currently does not check if the the user was successfully added.
+        // task.getStatus();
 /*        try {
            result = task.get();
         }catch(Exception e){
@@ -483,6 +490,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     /**
      * Represents an asynchronous add user to the remote database task
+     *
      * @author Robert Hinds
      * @version 1.0
      */
