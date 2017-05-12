@@ -45,12 +45,17 @@ public class RegisterActivity extends AppCompatActivity {
         submitButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 String result = addUser(ADD_USER_URL);
-
-                    Intent i = new Intent(RegisterActivity.this, LibraryDatabaseActivity.class);
-                    i.putExtra(getString(R.string.user_email), editTextUserName.getText().toString());
-                    i.putExtra(getString(R.string.user_password), editTextUserPassword.getText().toString());
-                    startActivity(i);
-
+                    if(finalResult.contains("success")) {
+                        Intent i = new Intent(RegisterActivity.this, LibraryDatabaseActivity.class);
+                        i.putExtra(getString(R.string.user_email), editTextUserName.getText().toString());
+                        i.putExtra(getString(R.string.user_password), editTextUserPassword.getText().toString());
+                        Toast msg = Toast.makeText(getBaseContext(), finalResult, Toast.LENGTH_LONG);
+                        msg.show();
+                        startActivity(i);
+                    }else{
+                        Toast msg = Toast.makeText(getBaseContext(), finalResult, Toast.LENGTH_LONG);
+                        msg.show();
+                    }
               //  finalResult = "";
             }
         } );
@@ -90,7 +95,7 @@ public class RegisterActivity extends AppCompatActivity {
      */
     private String addUser(String url) {
         String loginURL = buildLoginURL(url);
-        String result = "success";
+        String result = "";
 
         Log.i("login url" , loginURL);
             RegisterActivity.AddUserTask task = new RegisterActivity.AddUserTask();
@@ -151,7 +156,7 @@ public class RegisterActivity extends AppCompatActivity {
                         urlConnection.disconnect();
                 }
             }
-           // finalResult = response;
+            finalResult = response;
             return response;
         }
 
@@ -172,21 +177,21 @@ public class RegisterActivity extends AppCompatActivity {
                 String status = (String) jsonObject.get("result");
 
                 if (status.equals("success")) {
-                   Toast.makeText(getApplicationContext(), "User successfully added!"
+             /*      Toast.makeText(getApplicationContext(), "User successfully added!"
                             , Toast.LENGTH_LONG)
-                            .show();
-                 //   finalResult = "User successfully added!";
+                            .show();*/
+                    finalResult = "User successfully added!";
                 } else {
-                    Toast.makeText(getApplicationContext(), "Failed to add: "
+/*                    Toast.makeText(getApplicationContext(), "Failed to add: "
                                     + jsonObject.get("error")
                             , Toast.LENGTH_LONG)
-                            .show();
-               //   finalResult = "Failed to add: " + jsonObject.get("error");
+                            .show();*/
+                  finalResult = "Failed to add: " + jsonObject.get("error");
                 }
             } catch (JSONException e) {
-                Toast.makeText(getApplicationContext(), "Something wrong with the data" +
-                        e.getMessage(), Toast.LENGTH_LONG).show();
-           //  finalResult = "Something wrong with the data" + e.getMessage();
+/*                Toast.makeText(getApplicationContext(), "Something wrong with the data" +
+                        e.getMessage(), Toast.LENGTH_LONG).show();*/
+             finalResult = "Something wrong with the data" + e.getMessage();
             }
 
         }
