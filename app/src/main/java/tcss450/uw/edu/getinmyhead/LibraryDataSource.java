@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Data Access object (DAO)
- * Maintains database connection and supports adding new comments and fetching all comments.
+ * Maintains the database connection and creating and fetching items..
  */
 public class LibraryDataSource {
 

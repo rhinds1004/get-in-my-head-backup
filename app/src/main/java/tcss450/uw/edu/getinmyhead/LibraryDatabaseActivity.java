@@ -1,6 +1,8 @@
 package tcss450.uw.edu.getinmyhead;
 
+import android.app.IntentService;
 import android.app.ListActivity;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -66,6 +68,9 @@ public class LibraryDatabaseActivity extends ListActivity {
         LibItem libItem = null;
         switch (view.getId()) {
             case R.id.add_libitem:
+
+                Intent i = new Intent(this, ListFilesActivity.class);
+                startActivity(i);
 
                 String[] comments = new String[] { "Cool", "Very nice", "Hate it" };
                 int nextInt = new Random().nextInt(3);
