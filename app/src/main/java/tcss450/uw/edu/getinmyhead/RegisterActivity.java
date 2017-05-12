@@ -89,18 +89,18 @@ public class RegisterActivity extends AppCompatActivity {
      * @return result of the add user task
      */
     private String addUser(String url) {
-        String result = buildLoginURL(ADD_USER_URL);
+        String loginURL = buildLoginURL(url);
+        String result = "success";
 
-
-        if(!result.contains(getString(R.string.error_in_url))){
+        Log.i("login url" , loginURL);
             RegisterActivity.AddUserTask task = new RegisterActivity.AddUserTask();
-            task.execute(new String[]{url.toString()});
+            task.execute(new String[]{loginURL.toString()});
 
 /*                Toast msg = Toast.makeText(getBaseContext(), finalResult, Toast.LENGTH_LONG);
                 msg.show();
                 result = getString(R.string.error_in_url);
             finalResult = "";*/
-        }
+
         //currently does not check if the the user was successfully added.
         // task.getStatus();
 /*        try {
