@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2017.  Robert Hinds
+ */
+
 package tcss450.uw.edu.getinmyhead;
 
 import android.animation.Animator;
@@ -7,6 +11,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.app.LoaderManager.LoaderCallbacks;
 
@@ -32,6 +38,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -44,7 +53,12 @@ import java.util.List;
 import static android.Manifest.permission.READ_CONTACTS;
 
 /**
- * A login screen that offers login via email/password.
+ * A login screen that offers login via email/password. Uses Google login activity as base code.
+ * Also uses methods by Menaka Abraham.
+ *
+ * @author Robert Hinds
+ * @author Menaka Abraham
+ * @version 1.0
  */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
@@ -53,22 +67,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      */
     private static final int REQUEST_READ_CONTACTS = 0;
 
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
+
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private UserLoginTask mAuthTask = null;
-
-    /**
-     * User Data Acess Object
-     */
-
 
     // UI references.
     private AutoCompleteTextView mEmailView;
@@ -203,16 +206,17 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(true);
             mAuthTask = new UserLoginTask(email, password);
             mAuthTask.execute((Void) null);
+
         }
     }
 
     private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
+        //: Replace this with your own logic
         return email.contains("@");
     }
 
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
+        //: Replace this with your own logic
         return password.length() > 4;
     }
 
@@ -309,70 +313,90 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     /**
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
+     *
+     * @author Robert Hinds
+     * @version 1.0
      */
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
         private final String mEmail;
         private final String mPassword;
         private String errorType = "";
-        final String COURSE_ADD_URL
-
-                = "http://cssgate.insttech.washington.edu/~hindsr/Android/login.php?";
+        //location of the remote server
+        final String LOGIN_URL = "http://cssgate.insttech.washington.edu/~hindsr/Android/login.php?";
+        final String ADD_USER_URL = "http://cssgate.insttech.washington.edu/~hindsr/Android/adduser.php?";
 
         UserLoginTask(String email, String password) {
             mEmail = email;
             mPassword = password;
         }
 
+        /**
+         * Checks to if user login attempt is valid by connecting to remote host.
+         *
+         * @param params
+         * @return the result of the login attempt
+         * @author Robert Hinds
+         */
         @Override
         protected Boolean doInBackground(Void... params) {
             Boolean result = false;
-            // TODO: attempt authentication against a network service.
-          // String loginStr = ;
-            if(doUserLogin(buildCourseURL()).contains("success")){
+            errorType = doUserLogin(buildLoginURL(LOGIN_URL));
+            if (errorType.contains("success")) {
                 result = true;
+            } else {
+                if (errorType.contains("email")) {
+                    if (addUser(buildLoginURL(ADD_USER_URL)).contains("success")) {
+                        result = true;
+                    }
+                }
             }
-            else{
-                errorType = doUserLogin(buildCourseURL());
-                // TODO: register the new account here. if new account made return true else return false.
 
- /*               if(){
-
-                    result = true;
-                }*/
-            }
             return result;
         }
 
+        /**
+         * Method start LibraryDataBaseActivity if param is true. If param is false determines
+         * which part of the login attempt failed. Depending on which part of the login attempt
+         * failed, the appropriate error string is set and reqestfocus() is set on the view item
+         * that failed during the login attempt.
+         *
+         * @param success the result of the login attempt
+         * @author Robert Hinds
+         */
         @Override
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
             showProgress(false);
             //if username is correct and password is correct go into library database activity.
             //TODO change to up Main MENU UI
-            if(success){
+            if (success) {
+
                 Intent i = new Intent(LoginActivity.this, LibraryDatabaseActivity.class);
+                i.putExtra(getString(R.string.user_email), this.mEmail);
+                i.putExtra(getString(R.string.user_password), this.mPassword);
                 startActivity(i);
-            }else{
-                    if(errorType.contains("email")) {
-                        errorType = getString(R.string.error_invalid_email);
-                        mEmailView.setError(errorType);
-                        mEmailView.requestFocus();
+            } else {
+                if (errorType.contains("email")) {
+                    errorType = getString(R.string.error_incorrect_email);
+                    mEmailView.setError(errorType);
+                    mEmailView.requestFocus();
 
-                    }else if(errorType.contains("password")){
-                        errorType = getString(R.string.error_incorrect_password);
-                        mPasswordView.setError(errorType);
-                        mPasswordView.requestFocus();
+                } else if (errorType.contains("password")) {
+                    errorType = getString(R.string.error_incorrect_password);
+                    mPasswordView.setError(errorType);
+                    mPasswordView.requestFocus();
 
-                    }else if(errorType.contains("Something")){
-                        errorType = getString(R.string.error_in_url);
-                        Toast.makeText(getApplicationContext(),R.string.error_in_url , Toast.LENGTH_LONG).show();
+                } else if (errorType.contains("Something")) {
+                    errorType = getString(R.string.error_in_url);
+                    Toast.makeText(getApplicationContext(), R.string.error_in_url, Toast.LENGTH_LONG).show();
 
-                    }else{
-                        errorType = getString(R.string.error_unknown);
-                        mEmailView.setError(errorType);
-                        mEmailView.requestFocus();
-                    }
+                } else {
+                    errorType = getString(R.string.error_unknown);
+                    mEmailView.setError(errorType);
+                    mEmailView.requestFocus();
+                }
+
             }
         }
 
@@ -382,8 +406,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
         }
 
-        private String buildCourseURL() {
-            StringBuilder sb = new StringBuilder(COURSE_ADD_URL);
+        /**
+         * This method builds a http url string
+         *
+         * @return http login url on successful string creation or error string if unsuccessful
+         * @author Robert Hinds
+         */
+        private String buildLoginURL(String URL) {
+            StringBuilder sb = new StringBuilder(URL);
 
             try {
 
@@ -396,10 +426,19 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 Log.i("login url", sb.toString());
 
             } catch (Exception e) {
-               return getString(R.string.error_in_url) + e.getMessage();
+                return getString(R.string.error_in_url) + e.getMessage();
             }
             return sb.toString();
         }
+
+        /**
+         * This method uses http url string to authenticate a user on a remote server.
+         *
+         * @param urls
+         * @return an empty string on successful login and error message string on unsuccessful
+         * login
+         * @author Robert Hinds
+         */
         protected String doUserLogin(String... urls) {
             String response = "";
             HttpURLConnection urlConnection = null;
@@ -417,7 +456,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     }
 
                 } catch (Exception e) {
-                    response = "Unable to add course, Reason: "
+                    response = "Unable to verify user, Reason: "
                             + e.getMessage();
                 } finally {
                     if (urlConnection != null)
@@ -426,6 +465,100 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
             return response;
         }
+
     }
 
+    /**
+     * Method to add a user to the remote database
+     *
+     * @param url http url string
+     * @return result of the add user task
+     */
+    private String addUser(String url) {
+        AddUserTask task = new AddUserTask();
+        task.execute(new String[]{url.toString()});
+        String result = "success";
+        //currently does not check if the the user was successfully added.
+        // task.getStatus();
+/*        try {
+           result = task.get();
+        }catch(Exception e){
+
+        }*/
+        return result;
+    }
+
+    /**
+     * Represents an asynchronous add user to the remote database task
+     *
+     * @author Robert Hinds
+     * @version 1.0
+     */
+    private class AddUserTask extends AsyncTask<String, Void, String> {
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(String... urls) {
+            String response = "";
+            HttpURLConnection urlConnection = null;
+            for (String url : urls) {
+                try {
+                    URL urlObject = new URL(url);
+                    urlConnection = (HttpURLConnection) urlObject.openConnection();
+
+                    InputStream content = urlConnection.getInputStream();
+
+                    BufferedReader buffer = new BufferedReader(new InputStreamReader(content));
+                    String s = "";
+                    while ((s = buffer.readLine()) != null) {
+                        response += s;
+                    }
+
+                } catch (Exception e) {
+                    response = "Unable to add user, Reason: "
+                            + e.getMessage();
+                } finally {
+                    if (urlConnection != null)
+                        urlConnection.disconnect();
+                }
+            }
+            return response;
+        }
+
+
+        /**
+         * It checks to see if there was a problem with the URL(Network) which is when an
+         * exception is caught. It tries to call the parse Method and checks to see if it was successful.
+         * If not, it displays the exception.
+         *
+         * @param result
+         */
+        @Override
+        protected void onPostExecute(String result) {
+            // Something wrong with the network or the URL.
+            showProgress(false);
+            try {
+                JSONObject jsonObject = new JSONObject(result);
+                String status = (String) jsonObject.get("result");
+                if (status.equals("success")) {
+                    Toast.makeText(getApplicationContext(), "User successfully added!"
+                            , Toast.LENGTH_LONG)
+                            .show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Failed to add: "
+                                    + jsonObject.get("error")
+                            , Toast.LENGTH_LONG)
+                            .show();
+                }
+            } catch (JSONException e) {
+                Toast.makeText(getApplicationContext(), "Something wrong with the data" +
+                        e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        }
+    }
 }

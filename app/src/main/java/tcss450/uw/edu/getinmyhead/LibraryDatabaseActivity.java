@@ -1,4 +1,8 @@
 package tcss450.uw.edu.getinmyhead;
+/**
+ * Created by Robert Hinds on 5/1/2017.
+ * Used this tutorial as base. http://www.vogella.com/tutorials/AndroidSQLite/article.html
+ */
 
 import android.app.ListActivity;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +17,10 @@ import android.widget.Toast;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Allows the user to interact with the local database
+ * @author Robert Hinds
+ */
 public class LibraryDatabaseActivity extends ListActivity {
     private LibraryDataSource datasource;
 

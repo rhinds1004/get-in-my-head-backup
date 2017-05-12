@@ -1,17 +1,20 @@
 package tcss450.uw.edu.getinmyhead;
-
+/**
+ * Created by Robert Hinds on 5/1/2017.
+ * Used this tutorial as base. http://www.vogella.com/tutorials/AndroidSQLite/article.html
+ */
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+
 /**
- * Created by hinds on 5/1/2017.
- */
-
-
-/** database tables should use the identifier _id for the primary key of the table.
+ * Helper class to abstract the creation and upgrading of SQL tables.
+ * Database tables should use the identifier _id for the primary key of the table.
  * Several Android functions rely on this standard.
+ * @author Robert Hinds
+ * @version 1.0
  */
 
 public class LibraryOpenHelper extends SQLiteOpenHelper{
@@ -36,8 +39,8 @@ public class LibraryOpenHelper extends SQLiteOpenHelper{
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-    /** Creates SQLite database  if the database is accessed but not yet created.
-     *
+    /**
+     * Creates SQLite database if the database is accessed but not yet created.
      * @param db
      */
     @Override
@@ -46,13 +49,15 @@ public class LibraryOpenHelper extends SQLiteOpenHelper{
         db.execSQL(DATABASE_CREATE);
     }
 
-    /** method will simply delete all existing data and re-create the table.
+    /**
+     *  Method deletes all existing data and re-creates the table.
      *  Is called, if the database version is increased in application code. This method allows
      *  an update  of an existing database schema or to drop the existing database and recreate it
      *  via the onCreate() method.
-     * @param db
-     * @param oldVersion
-     * @param newVersion
+     * @param db         SQL database to be updated
+     * @param oldVersion previous database version
+     * @param newVersion new database version
+     *
      */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
