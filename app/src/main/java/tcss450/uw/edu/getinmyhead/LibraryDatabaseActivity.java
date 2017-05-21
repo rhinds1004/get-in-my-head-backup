@@ -5,6 +5,7 @@ package tcss450.uw.edu.getinmyhead;
  */
 
 import android.app.ListActivity;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -21,9 +22,11 @@ import java.util.Random;
  * Allows the user to interact with the local database
  * @author Robert Hinds
  */
+
+//need to have this activity open up a table with user names
 public class LibraryDatabaseActivity extends ListActivity {
     private LibraryDataSource datasource;
-
+    private List<LibItem> values;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,7 +35,7 @@ public class LibraryDatabaseActivity extends ListActivity {
         datasource = new LibraryDataSource(this);
         datasource.open();
 
-        List<LibItem> values = datasource.getAllLibItems();
+         values = datasource.getAllLibItems();
 
         // use the SimpleCursorAdapter to show the
         // elements in a ListView
@@ -40,16 +43,19 @@ public class LibraryDatabaseActivity extends ListActivity {
                 android.R.layout.simple_list_item_1, values);
         setListAdapter(adapter);
 
-        ListView listView = getListView();
+        final ListView listView = getListView();
         listView.setTextFilterEnabled(true);
 
         //short tap
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-                //TODO add logic so it opens the file when the listitem is clicked on.
-                Toast.makeText(getApplicationContext(),
-                        "short click", Toast.LENGTH_SHORT).show();
+                //TODO this probably needs to be worked on.
+                Intent i = new Intent(LibraryDatabaseActivity.this, ReaderActivity.class);
+
+                i.putExtra("item_text", values.get(position).getItemText());
+                startActivity(i);
+
             }
         });
 
@@ -79,6 +85,8 @@ public class LibraryDatabaseActivity extends ListActivity {
                 int nextInt = new Random().nextInt(3);
                 // save the new comment to the database
                 libItem = datasource.createLibItem(comments[nextInt], nextInt);
+                //TODO item text doesn't seem to save to the database.
+                libItem.setItemText(getString(R.string.temp_item_text_string));
                 adapter.add(libItem);
                 break;
             case R.id.delete_libitem:

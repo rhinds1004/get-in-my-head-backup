@@ -14,6 +14,7 @@ public class LibItem {
     private long id;
     private String title;
     private Integer lastSetting;
+    private String mItemText;
 
 
     public long getId() {
@@ -34,6 +35,13 @@ public class LibItem {
 
     public Integer getLastSetting() {
         return lastSetting;
+    }
+
+    public String getItemText(){
+        return this.mItemText;
+    }
+    public void setItemText(String itemText){
+         this.mItemText = itemText;
     }
 
     public void setLastSetting(Integer lastSetting) {
