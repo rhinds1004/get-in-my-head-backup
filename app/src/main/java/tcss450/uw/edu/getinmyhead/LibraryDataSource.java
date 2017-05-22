@@ -11,6 +11,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Bundle;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,7 +32,7 @@ public class LibraryDataSource {
     private SQLiteOpenHelper dbHelper;
     private SQLiteDatabase database;
     private String[] allColumns = { LibraryOpenHelper.COLUMN_LIB_ITEM_ID, LibraryOpenHelper.COLUMN_LIB_ITEM_NAME,
-            LibraryOpenHelper.COLUMN_LIB_ITEM_LAST_SETTING};
+            LibraryOpenHelper.COLUMN_LIB_ITEM_LAST_SETTING, LibraryOpenHelper.COLUMN_LIB_ITEM_TEXT};
 
     /**
      * Creates a new Database
@@ -46,7 +47,9 @@ public class LibraryDataSource {
      * @throws SQLException
      */
     public void open() throws SQLException {
+
         database = dbHelper.getWritableDatabase();
+       // dbHelper.onCreate(database);
     }
 
     /**
@@ -63,12 +66,13 @@ public class LibraryDataSource {
      * @return newly created LibItem
      * @author Robert Hinds
      */
-    public LibItem createLibItem(String myLibItemTitle, Integer myLibItemLastSetting){
+    public LibItem createLibItem(String myLibItemTitle, Integer myLibItemLastSetting, String myLibItemText){
         ContentValues values = new ContentValues(); // allows to define key/values. The key represents the table column identifier and the value represents the content for the table record in this column.
         values.put(LibraryOpenHelper.COLUMN_LIB_ITEM_NAME, myLibItemTitle);
         values.put(LibraryOpenHelper.COLUMN_LIB_ITEM_LAST_SETTING, myLibItemLastSetting);
-        long insertID = database.insert(LibraryOpenHelper.TABLE_LIBRARY, null, values);
-        Cursor cursor = database.query(LibraryOpenHelper.TABLE_LIBRARY, allColumns,
+        values.put(LibraryOpenHelper.COLUMN_LIB_ITEM_TEXT, myLibItemText);
+        long insertID = database.insert(LibraryOpenHelper.TABLE_NAME, null, values);
+        Cursor cursor = database.query(LibraryOpenHelper.TABLE_NAME, allColumns,
                 LibraryOpenHelper.COLUMN_LIB_ITEM_ID + " = " + insertID, null, null, null, null);
         cursor.moveToFirst();
         LibItem mLibItem = cursorToLibItem(cursor);
@@ -102,14 +106,14 @@ public class LibraryDataSource {
     public void deleteLibItem(LibItem mLibItem) {
         long id = mLibItem.getId();
         System.out.println("Comment deleted with id: " + id);
-        database.delete(LibraryOpenHelper.TABLE_LIBRARY, LibraryOpenHelper.COLUMN_LIB_ITEM_ID
+        database.delete(LibraryOpenHelper.TABLE_NAME, LibraryOpenHelper.COLUMN_LIB_ITEM_ID
                 + " = " + id, null);
     }
 
     public List<LibItem> getAllLibItems(){
         List<LibItem> libItems = new ArrayList<LibItem>();
 
-        Cursor cursor = database.query(LibraryOpenHelper.TABLE_LIBRARY, allColumns, null, null, null,
+        Cursor cursor = database.query(LibraryOpenHelper.TABLE_NAME, allColumns, null, null, null,
                 null, null);
         cursor.moveToFirst();
         while(!cursor.isAfterLast()){
@@ -132,7 +136,8 @@ public class LibraryDataSource {
         LibItem mLibItem = new LibItem();
         mLibItem.setId(cursor.getLong(0));
         mLibItem.setTitle(cursor.getString(1));
-        mLibItem.setLastSetting(Integer.getInteger(cursor.getString(2)));
+        mLibItem.setLastSetting(Integer.parseInt(cursor.getString(2)));
+        mLibItem.setItemText(cursor.getString(3));
         return mLibItem;
     }
 
