@@ -6,6 +6,7 @@ package tcss450.uw.edu.getinmyhead;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Bundle;
 import android.util.Log;
 
 
@@ -19,19 +20,22 @@ import android.util.Log;
 
 public class LibraryOpenHelper extends SQLiteOpenHelper{
 
-    public static final String TABLE_LIBRARY = "library";  //table name
+    public static String TABLE_NAME = "library";  //table name
     public static final String COLUMN_LIB_ITEM_ID = "_id";
     public static final String COLUMN_LIB_ITEM_NAME = "item_name";
     public static final String COLUMN_LIB_ITEM_LAST_SETTING = "last_setting";
+    public static final String COLUMN_LIB_ITEM_TEXT = "item_text";
 
     private static final String DATABASE_NAME = "LibraryOfText.db";
     private static final int DATABASE_VERSION = 1;
 
+
     /* DataBase creating sql statement */
-    private static final String DATABASE_CREATE ="create table " + TABLE_LIBRARY + "( " +
+    private static final String DATABASE_CREATE ="create table " + TABLE_NAME + "( " +
             COLUMN_LIB_ITEM_ID + " INTEGER primary key autoincrement, " +
             COLUMN_LIB_ITEM_NAME + " TEXT not null," +
-            COLUMN_LIB_ITEM_LAST_SETTING + " INTEGER" +
+            COLUMN_LIB_ITEM_LAST_SETTING + " INTEGER," +
+            COLUMN_LIB_ITEM_TEXT + " TEXT" +
             " );";
 
     //constructor
@@ -64,7 +68,7 @@ public class LibraryOpenHelper extends SQLiteOpenHelper{
         Log.w(LibraryOpenHelper.class.getName(),
                 "Upgrading database from version " + oldVersion + " to "
                         + newVersion + ", which will destroy all old data");
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_LIBRARY);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
     }
 }
