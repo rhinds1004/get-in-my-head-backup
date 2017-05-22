@@ -15,6 +15,8 @@ import android.widget.Toast;
 
 public class ReaderActivity extends AppCompatActivity implements ReadTextFragment.OnFragmentInteractionListener{
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,7 +26,7 @@ public class ReaderActivity extends AppCompatActivity implements ReadTextFragmen
         int mLastSet = getIntent().getExtras().getInt(getString(R.string.key_last_setting));
         ReadTextFragment readTextFragment = new ReadTextFragment();
         Bundle args = new Bundle();
-        args.putString(getString(R.string.key_item_text), mItemText);
+        args.putString(getString(R.string.key_item_text), mItemText); // passing values of the libItem selected to readTextFragment
         args.putInt(getString(R.string.key_last_setting), mLastSet);
 readTextFragment.setArguments(args);
         getSupportFragmentManager().beginTransaction()

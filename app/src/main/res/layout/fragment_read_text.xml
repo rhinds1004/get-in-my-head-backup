@@ -35,7 +35,7 @@
         android:layout_height="30dp"
         android:layout_below="@+id/textView1"
         android:layout_gravity="bottom"
-        android:max="100"
+        android:max="10"
         android:progress="100"
 
         android:thumb="@android:drawable/btn_default_small" />

@@ -29,6 +29,7 @@ public class ReadTextFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private TextView mitemTextView;
+    private int progressScaler = 10;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -80,7 +81,7 @@ mSeekBar.setProgress(getArguments().getInt(getString(R.string.key_last_setting))
             int processChanged = 0;
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                processChanged = progress;
+                processChanged = progress * progressScaler;
             }
 
             @Override

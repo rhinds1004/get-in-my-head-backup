@@ -85,7 +85,7 @@ public class LibraryDatabaseActivity extends ListActivity {
                 int nextInt = new Random().nextInt(3);
 
                 // save the new comment to the database
-                libItem = datasource.createLibItem(comments[nextInt], 50 , getString(R.string.temp_item_text_string));
+                libItem = datasource.createLibItem(comments[nextInt], 5 , getString(R.string.temp_item_text_string));
                 //TODO item text doesn't seem to save to the database.
                 //libItem.setItemText(getString(R.string.temp_item_text_string));
 
