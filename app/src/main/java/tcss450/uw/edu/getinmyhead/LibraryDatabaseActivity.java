@@ -36,6 +36,7 @@ public class LibraryDatabaseActivity extends ListActivity {
         datasource = new LibraryDataSource(this);
         datasource.open();
 
+
         List<LibItem> values = datasource.getAllLibItems();
 
         // use the SimpleCursorAdapter to show the

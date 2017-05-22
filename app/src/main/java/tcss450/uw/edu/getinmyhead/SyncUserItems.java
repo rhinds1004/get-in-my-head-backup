@@ -96,7 +96,7 @@ public class SyncUserItems extends IntentService {
         URL urlObject = null;
         try {
             Log.i("SyncUserItems: ", "inside Try");
-            urlObject = new URL(("http://cssgate.insttech.washington.edu/~_450bteam14/library.php?useritems=you@uw.edu"));
+            urlObject = new URL(("http://cssgate.insttech.washington.edu/~_450bteam14/library.php?useritems=me@uw.edu"));
             urlConnection = (HttpURLConnection) urlObject.openConnection();
             Log.i("SyncUserItems: ", "After URL Connection");
             InputStream content = urlConnection.getInputStream();
@@ -110,6 +110,7 @@ public class SyncUserItems extends IntentService {
             JSONArray arr = new JSONArray(result);
             datasource = new LibraryDataSource(this);
             datasource.open();
+            datasource.upgrade();
             for(int i = 0; i < arr.length(); i++) {
                 JSONObject obj = arr.getJSONObject(i);
                 datasource.createLibItem(obj.getString("title"), 5);

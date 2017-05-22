@@ -136,4 +136,9 @@ public class LibraryDataSource {
         return mLibItem;
     }
 
+    public void upgrade() {
+
+        dbHelper.onUpgrade(database, 1,1);
+    }
+
 }
