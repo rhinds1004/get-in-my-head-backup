@@ -1,8 +1,10 @@
-package tcss450.uw.edu.getinmyhead;
 /**
  * Created by Robert Hinds on 5/1/2017.
  * Used this tutorial as base. http://www.vogella.com/tutorials/AndroidSQLite/article.html
+ * TCSS 450
+ *
  */
+package tcss450.uw.edu.getinmyhead;
 
 import android.app.IntentService;
 import android.app.ListActivity;
@@ -77,8 +79,8 @@ public class LibraryDatabaseActivity extends ListActivity {
         switch (view.getId()) {
             case R.id.add_libitem:
 
-                Intent i = new Intent(this, ListFilesActivity.class);
-                startActivity(i);
+                //Intent i = new Intent(this, ListFilesActivity.class);
+                //startActivity(i);
 
                 String[] comments = new String[] { "Cool", "Very nice", "Hate it" };
                 int nextInt = new Random().nextInt(3);

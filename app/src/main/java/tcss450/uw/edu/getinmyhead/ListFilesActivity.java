@@ -1,3 +1,8 @@
+/**
+ * Created by Zach Wingo on 5/1/2017.
+ *
+ */
+
 package tcss450.uw.edu.getinmyhead;
 
 import android.app.ListActivity;
@@ -114,6 +119,7 @@ public class ListFilesActivity extends ListActivity {
             if(sb.length() > 0) {
                 try {
                     str = "http://cssgate.insttech.washington.edu/~wingoz/test.php?body="+ URLEncoder.encode(sb.toString(), "UTF-8");
+
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
@@ -138,6 +144,8 @@ public class ListFilesActivity extends ListActivity {
             HttpURLConnection urlConnection = null;
             for (String url : urls) {
                 try {
+                    Log.i("URL: ", url);
+
                     URL urlObject = new URL(url);
                     urlConnection = (HttpURLConnection) urlObject.openConnection();
 
@@ -170,24 +178,24 @@ public class ListFilesActivity extends ListActivity {
          */
         @Override
         protected void onPostExecute(String result) {
-            // Something wrong with the network or the URL.
-            try {
-                JSONObject jsonObject = new JSONObject(result);
-                String status = (String) jsonObject.get("result");
-                if (status.equals("success")) {
-                    Toast.makeText(getApplicationContext(), "text successfully added!"
-                            , Toast.LENGTH_LONG)
-                            .show();
-                } else {
-                    Toast.makeText(getApplicationContext(), "Failed to add: "
-                                    + jsonObject.get("error")
-                            , Toast.LENGTH_LONG)
-                            .show();
-                }
-            } catch (JSONException e) {
-                Toast.makeText(getApplicationContext(), "Something wrong with the data" +
-                        e.getMessage(), Toast.LENGTH_LONG).show();
-            }
+//            // Something wrong with the network or the URL.
+//            try {
+//                JSONObject jsonObject = new JSONObject(result);
+//                String status = (String) jsonObject.get("result");
+//                if (status.equals("success")) {
+//                    Toast.makeText(getApplicationContext(), "text successfully added!"
+//                            , Toast.LENGTH_LONG)
+//                            .show();
+//                } else {
+//                    Toast.makeText(getApplicationContext(), "Failed to add: "
+//                                    + jsonObject.get("error")
+//                            , Toast.LENGTH_LONG)
+//                            .show();
+//                }
+//            } catch (JSONException e) {
+//                Toast.makeText(getApplicationContext(), "Something wrong with the data" +
+//                        e.getMessage(), Toast.LENGTH_LONG).show();
+//            }
         }
     }
 }

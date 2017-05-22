@@ -55,6 +55,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static android.Manifest.permission.READ_CONTACTS;
+import static java.lang.Thread.sleep;
 
 /**
  * A login screen that offers login via email/password. Uses Google login activity as base code.
@@ -393,6 +394,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             //TODO change to up Main MENU UI
             if (success) {
 
+                Log.i("LoginActivity: ", "Success...before calling startActionDownload");
+                SyncUserItems.startActionDownload(LoginActivity.this, this.mEmail);
+                Log.i("LoginActivity: ", "Success...after calling startActionDownload");
+
+                try {
+                    sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 Intent i = new Intent(LoginActivity.this, LibraryDatabaseActivity.class);
                 i.putExtra(getString(R.string.user_email), this.mEmail);
                 i.putExtra(getString(R.string.user_password), this.mPassword);
