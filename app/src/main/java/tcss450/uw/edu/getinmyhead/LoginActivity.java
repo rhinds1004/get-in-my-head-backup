@@ -7,12 +7,16 @@ package tcss450.uw.edu.getinmyhead;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.app.LoaderManager.LoaderCallbacks;
 
@@ -60,7 +64,7 @@ import static android.Manifest.permission.READ_CONTACTS;
  * @author Menaka Abraham
  * @version 1.0
  */
-public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
+public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor>, UserRegisterDialogFragment.NoticeDialogListener {
 
     /**
      * Id to identity READ_CONTACTS permission request.
@@ -95,6 +99,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.login || id == EditorInfo.IME_NULL) {
                     attemptLogin();
+
                     return true;
                 }
                 return false;
@@ -106,6 +111,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             @Override
             public void onClick(View view) {
                 attemptLogin();
+
             }
         });
 
@@ -299,6 +305,21 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mEmailView.setAdapter(adapter);
     }
 
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+        Intent i = new Intent(LoginActivity.this, RegisterActivity.class);
+        i.putExtra(getString(R.string.user_email), dialog.getArguments().getString(getString(R.string.user_email)));
+        i.putExtra(getString(R.string.user_password), dialog.getArguments().getString(getString(R.string.user_password)));
+        startActivity(i);
+        System.out.println("click");
+
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+
+    }
+
 
     private interface ProfileQuery {
         String[] PROJECTION = {
@@ -317,8 +338,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * @author Robert Hinds
      * @version 1.0
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-
+    public class UserLoginTask extends AsyncTask<Void, Void, Boolean>  {
+      //  private final DialogFragment myFrag = new UserRegisterDialogFragment();
         private final String mEmail;
         private final String mPassword;
         private String errorType = "";
@@ -346,9 +367,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 result = true;
             } else {
                 if (errorType.contains("email")) {
-                    if (addUser(buildLoginURL(ADD_USER_URL)).contains("success")) {
-                        result = true;
-                    }
+                   // if (addUser(buildLoginURL(ADD_USER_URL)).contains("success")) {
+                     //   result = true;
+                   // }
                 }
             }
 
@@ -378,6 +399,17 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 startActivity(i);
             } else {
                 if (errorType.contains("email")) {
+                    if( errorType.contains("email")){
+
+                        Bundle args = new Bundle();
+                        args.putString(getString(R.string.user_email), this.mEmail);
+                        args.putString(getString(R.string.user_password), this.mPassword);
+
+                        DialogFragment myFrag = new UserRegisterDialogFragment();
+                        myFrag.setArguments(args);
+                        myFrag.show(getSupportFragmentManager(), "register");
+
+                    }
                     errorType = getString(R.string.error_incorrect_email);
                     mEmailView.setError(errorType);
                     mEmailView.requestFocus();
@@ -465,6 +497,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
             return response;
         }
+
 
     }
 

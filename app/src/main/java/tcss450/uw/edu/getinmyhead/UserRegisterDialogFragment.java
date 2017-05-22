@@ -22,13 +22,24 @@ public class UserRegisterDialogFragment extends DialogFragment {
      * Each method passes the DialogFragment in case the host needs to query it. */
     public interface NoticeDialogListener {
         public void onDialogPositiveClick(DialogFragment dialog);
-
         public void onDialogNegativeClick(DialogFragment dialog);
     }
 
     // Use this instance of the interface to deliver action events
     NoticeDialogListener mListener;
+    // Use this instance of the interface to deliver action events
+    public static UserRegisterDialogFragment newInstance(int title) {
+        UserRegisterDialogFragment frag = new UserRegisterDialogFragment();
+        Bundle args = new Bundle();
+        args.putInt("title", title);
+        frag.setArguments(args);
+        return frag;
+    }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -39,12 +50,15 @@ public class UserRegisterDialogFragment extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //go to register account screen
+                        mListener.onDialogPositiveClick(UserRegisterDialogFragment.this);
+
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //return to login screen.
+                        mListener.onDialogNegativeClick(UserRegisterDialogFragment.this);
                     }
                 });
         return builder.create();
