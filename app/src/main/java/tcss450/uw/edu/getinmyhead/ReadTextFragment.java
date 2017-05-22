@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 
@@ -33,6 +34,7 @@ public class ReadTextFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+private SeekBar mSeekBar;
 
     public ReadTextFragment() {
         // Required empty public constructor
@@ -71,7 +73,26 @@ public class ReadTextFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_read_text, container, false);
         mitemTextView = (TextView)view.findViewById(R.id.itemText);
-        mitemTextView.setText(getArguments().getString("itemText"));
+        mitemTextView.setText(getArguments().getString("item_text"));
+        mSeekBar = (SeekBar) view.findViewById(R.id.seekBar);
+mSeekBar.setProgress(getArguments().getInt(getString(R.string.key_last_setting)));
+        mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            int processChanged = 0;
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                processChanged = progress;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
         return view;
     }
 
@@ -98,6 +119,8 @@ public class ReadTextFragment extends Fragment {
         super.onDetach();
         mListener = null;
     }
+
+
 
     /**
      * This interface must be implemented by activities that contain this

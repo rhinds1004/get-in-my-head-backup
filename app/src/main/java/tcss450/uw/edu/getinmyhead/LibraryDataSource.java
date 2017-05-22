@@ -28,7 +28,7 @@ public class LibraryDataSource {
     private SQLiteOpenHelper dbHelper;
     private SQLiteDatabase database;
     private String[] allColumns = { LibraryOpenHelper.COLUMN_LIB_ITEM_ID, LibraryOpenHelper.COLUMN_LIB_ITEM_NAME,
-            LibraryOpenHelper.COLUMN_LIB_ITEM_LAST_SETTING};
+            LibraryOpenHelper.COLUMN_LIB_ITEM_LAST_SETTING, LibraryOpenHelper.COLUMN_LIB_ITEM_TEXT};
 
     /**
      * Creates a new Database
@@ -62,10 +62,11 @@ public class LibraryDataSource {
      * @return newly created LibItem
      * @author Robert Hinds
      */
-    public LibItem createLibItem(String myLibItemTitle, Integer myLibItemLastSetting){
+    public LibItem createLibItem(String myLibItemTitle, Integer myLibItemLastSetting, String myLibItemText){
         ContentValues values = new ContentValues(); // allows to define key/values. The key represents the table column identifier and the value represents the content for the table record in this column.
         values.put(LibraryOpenHelper.COLUMN_LIB_ITEM_NAME, myLibItemTitle);
         values.put(LibraryOpenHelper.COLUMN_LIB_ITEM_LAST_SETTING, myLibItemLastSetting);
+        values.put(LibraryOpenHelper.COLUMN_LIB_ITEM_TEXT, myLibItemText);
         long insertID = database.insert(LibraryOpenHelper.TABLE_NAME, null, values);
         Cursor cursor = database.query(LibraryOpenHelper.TABLE_NAME, allColumns,
                 LibraryOpenHelper.COLUMN_LIB_ITEM_ID + " = " + insertID, null, null, null, null);
@@ -113,7 +114,8 @@ public class LibraryDataSource {
         LibItem mLibItem = new LibItem();
         mLibItem.setId(cursor.getLong(0));
         mLibItem.setTitle(cursor.getString(1));
-        mLibItem.setLastSetting(Integer.getInteger(cursor.getString(2)));
+        mLibItem.setLastSetting(Integer.parseInt(cursor.getString(2)));
+        mLibItem.setItemText(cursor.getString(3));
         return mLibItem;
     }
 

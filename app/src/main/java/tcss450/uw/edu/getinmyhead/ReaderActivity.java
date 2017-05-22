@@ -20,10 +20,12 @@ public class ReaderActivity extends AppCompatActivity implements ReadTextFragmen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reader);
 
-       String mItemText =  getIntent().getExtras().getString("item_text");
+       String mItemText =  getIntent().getExtras().getString(getString(R.string.key_item_text));
+        int mLastSet = getIntent().getExtras().getInt(getString(R.string.key_last_setting));
         ReadTextFragment readTextFragment = new ReadTextFragment();
         Bundle args = new Bundle();
-        args.putString(getString(R.string.args_key_string_itemText), mItemText);
+        args.putString(getString(R.string.key_item_text), mItemText);
+        args.putInt(getString(R.string.key_last_setting), mLastSet);
 readTextFragment.setArguments(args);
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.fragment_container, readTextFragment)

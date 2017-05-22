@@ -24,11 +24,12 @@ public class LibraryOpenHelper extends SQLiteOpenHelper{
     public static final String COLUMN_LIB_ITEM_ID = "_id";
     public static final String COLUMN_LIB_ITEM_NAME = "item_name";
     public static final String COLUMN_LIB_ITEM_LAST_SETTING = "last_setting";
+    public static final String COLUMN_LIB_ITEM_TEXT = "item_text";
 
     private static final String DATABASE_NAME = "LibraryOfText.db";
     private static final int DATABASE_VERSION = 1;
 
-    private static final String COLUMN_LIB_ITEM_TEXT = "item_text";
+
     /* DataBase creating sql statement */
     private static final String DATABASE_CREATE ="create table " + TABLE_NAME + "( " +
             COLUMN_LIB_ITEM_ID + " INTEGER primary key autoincrement, " +

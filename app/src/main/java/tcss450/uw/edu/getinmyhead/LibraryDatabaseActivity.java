@@ -52,8 +52,8 @@ public class LibraryDatabaseActivity extends ListActivity {
                                     int position, long id) {
                 //TODO this probably needs to be worked on.
                 Intent i = new Intent(LibraryDatabaseActivity.this, ReaderActivity.class);
-
-                i.putExtra("item_text", values.get(position).getItemText());
+                i.putExtra(getString(R.string.key_last_setting), values.get(position).getLastSetting());
+                i.putExtra(getString(R.string.key_item_text), values.get(position).getItemText());
                 startActivity(i);
 
             }
@@ -83,10 +83,12 @@ public class LibraryDatabaseActivity extends ListActivity {
 
                 String[] comments = new String[] { "Cool", "Very nice", "Hate it" };
                 int nextInt = new Random().nextInt(3);
+
                 // save the new comment to the database
-                libItem = datasource.createLibItem(comments[nextInt], nextInt);
+                libItem = datasource.createLibItem(comments[nextInt], 50 , getString(R.string.temp_item_text_string));
                 //TODO item text doesn't seem to save to the database.
-                libItem.setItemText(getString(R.string.temp_item_text_string));
+                //libItem.setItemText(getString(R.string.temp_item_text_string));
+
                 adapter.add(libItem);
                 break;
             case R.id.delete_libitem:

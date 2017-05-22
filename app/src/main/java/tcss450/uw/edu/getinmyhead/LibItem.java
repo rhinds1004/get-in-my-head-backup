@@ -13,7 +13,7 @@ package tcss450.uw.edu.getinmyhead;
 public class LibItem {
     private long id;
     private String title;
-    private Integer lastSetting;
+    private int lastSetting;
     private String mItemText;
 
 
@@ -33,7 +33,7 @@ public class LibItem {
         this.title = title;
     }
 
-    public Integer getLastSetting() {
+    public int getLastSetting() {
         return lastSetting;
     }
 
@@ -44,7 +44,7 @@ public class LibItem {
          this.mItemText = itemText;
     }
 
-    public void setLastSetting(Integer lastSetting) {
+    public void setLastSetting(int lastSetting) {
         this.lastSetting = lastSetting;
     }
 
