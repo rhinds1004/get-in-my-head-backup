@@ -23,11 +23,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity android:name=".LibraryDatabaseActivity"
             android:label="Library"/>
         <activity android:name=".RegisterActivity" />
         <activity
             android:name=".ReaderActivity" />
+
+
+        
+        <activity android:name=".RegisterActivity" />
+
+        <service
+            android:name=".SyncUserItems"
+            android:exported="false"></service>
 
     </application>
 

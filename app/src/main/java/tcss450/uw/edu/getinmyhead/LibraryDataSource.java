@@ -13,6 +13,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,6 +78,24 @@ public class LibraryDataSource {
         LibItem mLibItem = cursorToLibItem(cursor);
         cursor.close();
         return mLibItem;
+    }
+
+    /**
+     * Adds a LibItem to the Database
+     * @return newly created LibItem
+     * @author Robert Hinds
+     */
+    public void createLibItemsFromJsonArray(String myLibItems){
+        try {
+            JSONArray arr = new JSONArray(myLibItems);
+            for(int i = 0; i < arr.length(); i++) {
+                JSONObject obj = arr.getJSONObject(i);
+
+                createLibItem("Yay", 5);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
