@@ -14,8 +14,15 @@ import android.view.ViewGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+
 
 /**
+ * displays the text from the selected Libitem and allows the user to control how many letters
+ * shall be removed to aid in study.
+ * @author Robert Hinds
+ * @modified 5/22/2016
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
  * {@link ReadTextFragment.OnFragmentInteractionListener} interface
@@ -35,7 +42,7 @@ public class ReadTextFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
-private SeekBar mSeekBar;
+    private SeekBar mSeekBar;
 
     public ReadTextFragment() {
         // Required empty public constructor
@@ -68,19 +75,30 @@ private SeekBar mSeekBar;
         }
     }
 
+    /**
+     * When called, this method will create a view and also set the letters removed to the last
+     * setting used by the user.
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     * @author Robert Hinds
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_read_text, container, false);
         mitemTextView = (TextView)view.findViewById(R.id.itemText);
-        mitemTextView.setText(getArguments().getString("item_text"));
+        mitemTextView.setText(wordVanisher(getArguments().getString("item_text"),
+                getArguments().getInt(getString(R.string.key_last_setting))));
         mSeekBar = (SeekBar) view.findViewById(R.id.seekBar);
-mSeekBar.setProgress(getArguments().getInt(getString(R.string.key_last_setting)));
+        mSeekBar.setProgress(getArguments().getInt(getString(R.string.key_last_setting)));
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int processChanged = 0;
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                mitemTextView.setText(wordVanisher(getArguments().getString("item_text"), progress));
                 processChanged = progress * progressScaler;
             }
 
@@ -136,5 +154,38 @@ mSeekBar.setProgress(getArguments().getInt(getString(R.string.key_last_setting))
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+
+    /**
+     * Method removes a percentage of the letters from the words in a string based on the length of
+     * each word and the desired value inputted by the user.
+     * @param stringToVanish
+     * @param numOfLettersToVanish
+     * @return string with letters removed.
+     * @author Robert Hinds
+     */
+    private String wordVanisher(String stringToVanish, int numOfLettersToVanish){
+        String[] strArr = stringToVanish.split("\\P{L}+");
+        StringBuilder sb = new StringBuilder(stringToVanish);
+        long percentOfLettersToVanish;
+        for(int i = 0; i < strArr.length; i++){
+            int strLen = strArr[i].length();
+            StringBuilder tempSB = new StringBuilder(strArr[i]);
+            percentOfLettersToVanish = Math.round(strLen*(numOfLettersToVanish/10.0));
+            if(percentOfLettersToVanish > (strLen-1) ){
+                for(int j = strLen-1; j > 0; j--){
+                    tempSB.setCharAt(j, '_');
+                }
+            } else {
+                for(int j = strLen-1; j > (strLen - percentOfLettersToVanish) - 1; j--){
+                    tempSB.setCharAt(j, '_');
+                }
+            }
+            int pos = sb.indexOf(strArr[i]);
+            sb.replace(pos, pos + strArr[i].length(), tempSB.toString());
+            tempSB.delete(0,tempSB.length());
+        }
+        return sb.toString();
     }
 }

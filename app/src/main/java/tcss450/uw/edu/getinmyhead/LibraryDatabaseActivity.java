@@ -27,6 +27,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Random;
 
@@ -39,11 +40,12 @@ import java.util.Random;
 public class LibraryDatabaseActivity extends ListActivity {
     private LibraryDataSource datasource;
     private List<LibItem> values;
+    private String myEmail;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_library_database);
-
+        myEmail = getIntent().getExtras().getString("userEmail");
         datasource = new LibraryDataSource(this);
         datasource.open();
 
@@ -75,12 +77,16 @@ public class LibraryDatabaseActivity extends ListActivity {
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                ArrayAdapter<LibItem> adapter = (ArrayAdapter<LibItem>) getListAdapter();
+                LibItem libItem = values.get(position);
                 //TODO add logic so a dialog window pops up to (delete, edit or something) on long click on listitem.
                 Toast.makeText(getApplicationContext(), "Long click",
                         Toast.LENGTH_SHORT).show();
                 //Log.i("Long Click: ", datasource.getSingleItem( (int)values.get(position).getId() ).getItemText());
 
-                performFileSearch();
+                datasource.deleteLibItem(libItem);
+                adapter.remove(libItem);
+                adapter.notifyDataSetChanged();
                 return true;
             }
         });
@@ -127,7 +133,11 @@ public class LibraryDatabaseActivity extends ListActivity {
             if (resultData != null) {
                 uri = resultData.getData();
                 try {
-                    Log.i("File Picker: ", readTextFromUri(uri));
+                    String body  = readTextFromUri(uri);
+                    String title = (body.length() < 15) ? body : body.substring(0,14);
+                    String url = "http://cssgate.insttech.washington.edu/~_450bteam14/library.php?email="+ myEmail + "&title=" + URLEncoder.encode(title, "UTF-8") +"&body=" + URLEncoder.encode(body, "UTF-8") + "&position=1";
+                    Log.i("onActivityResult: ", url);
+                    SyncUserItems.startActionUpload(LibraryDatabaseActivity.this, myEmail, url);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -166,13 +176,14 @@ public class LibraryDatabaseActivity extends ListActivity {
                 //Intent i = new Intent(this, ListFilesActivity.class);
                 //startActivity(i);
 
-                String[] comments = new String[] { "Cool", "Very nice", "Hate it" };
-                int nextInt = new Random().nextInt(3);
+                //String[] comments = new String[] { "Cool", "Very nice", "Hate it" };
+                //int nextInt = new Random().nextInt(3);
 
                 // save the new comment to the database
-                libItem = datasource.createLibItem(comments[nextInt], 5 , getString(R.string.temp_item_text_string));
+                //libItem = datasource.createLibItem(comments[nextInt], 5 , getString(R.string.temp_item_text_string));
 
-                adapter.add(libItem);
+                //adapter.add(libItem);
+                performFileSearch();
                 break;
             case R.id.delete_libitem:
                 if (getListAdapter().getCount() > 0) {
