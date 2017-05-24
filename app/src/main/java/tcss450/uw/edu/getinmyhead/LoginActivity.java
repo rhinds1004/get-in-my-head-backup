@@ -399,7 +399,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 Log.i("LoginActivity: ", "Success...after calling startActionDownload");
 
                 try {
-                    sleep(10);
+                    sleep(1500);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

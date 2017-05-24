@@ -7,11 +7,13 @@ package tcss450.uw.edu.getinmyhead;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -80,23 +82,6 @@ public class LibraryDataSource {
         return mLibItem;
     }
 
-    /**
-     * Adds a LibItem to the Database
-     * @return newly created LibItem
-     * @author Robert Hinds
-     */
-    public void createLibItemsFromJsonArray(String myLibItems){
-        try {
-            JSONArray arr = new JSONArray(myLibItems);
-            for(int i = 0; i < arr.length(); i++) {
-                JSONObject obj = arr.getJSONObject(i);
-
-                createLibItem("Yay", 5);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * Deletes a LibItem from the Database
@@ -126,6 +111,18 @@ public class LibraryDataSource {
         return libItems;
     }
 
+    public LibItem getSingleItem(int id) {
+        Cursor cursor = database.query(LibraryOpenHelper.TABLE_NAME, allColumns, "_id="+id,null, null, null, null);
+        LibItem libItem = new LibItem();
+        if(cursor.moveToFirst()) {
+            libItem.setId(cursor.getLong(0));
+            libItem.setTitle(cursor.getString(1));
+            libItem.setLastSetting(Integer.parseInt(cursor.getString(2)));
+            libItem.setItemText(cursor.getString(3));
+        }
+        cursor.close();
+        return libItem;
+    }
     /**
      * Helper function that sets the data fields for the LibItem object.
      * @param cursor The element of the SQL query
