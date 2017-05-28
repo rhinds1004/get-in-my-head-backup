@@ -84,11 +84,14 @@ public class ListFilesActivity extends ListActivity {
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id)  {
         String filename = (String) getListAdapter().getItem(position);
-        //filename = filename.substring(1);
+
         if (path.endsWith(File.separator)) {
+            Log.i("Path Separator", "+ " + File.separator);
             filename = path + filename;
+            Log.i("Filename: ", filename);
         } else {
             filename = path + File.separator + filename;
+            Log.i("Filename else: ", filename);
         }
         if (new File(filename).isDirectory()) {
             Intent intent = new Intent(this, ListFilesActivity.class);

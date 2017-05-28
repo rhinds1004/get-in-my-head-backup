@@ -13,6 +13,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Toast;
 
+/**
+ * container for the ReadTextFragment.
+ * @author Robert Hinds
+ * @version 5/22/2016
+ */
 public class ReaderActivity extends AppCompatActivity implements ReadTextFragment.OnFragmentInteractionListener{
 
 
@@ -22,13 +27,13 @@ public class ReaderActivity extends AppCompatActivity implements ReadTextFragmen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reader);
 
-       String mItemText =  getIntent().getExtras().getString(getString(R.string.key_item_text));
+        String mItemText =  getIntent().getExtras().getString(getString(R.string.key_item_text));
         int mLastSet = getIntent().getExtras().getInt(getString(R.string.key_last_setting));
         ReadTextFragment readTextFragment = new ReadTextFragment();
         Bundle args = new Bundle();
         args.putString(getString(R.string.key_item_text), mItemText); // passing values of the libItem selected to readTextFragment
         args.putInt(getString(R.string.key_last_setting), mLastSet);
-readTextFragment.setArguments(args);
+        readTextFragment.setArguments(args);
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.fragment_container, readTextFragment)
                 .commit();

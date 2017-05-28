@@ -31,8 +31,10 @@ import java.net.URL;
 public class SyncUserItems extends IntentService {
 
     private static final String ACTION_DOWNLOAD = "tcss450.uw.edu.getinmyhead.action.ACTION_DOWNLOAD";
-    private static final String ACTION_UPLOAD = "tcss450.uw.edu.getinmyhead.action.ACTION_DOWNLOAD";
-    public static final String USER_EMAIL = "Email";
+    private static final String ACTION_UPLOAD = "tcss450.uw.edu.getinmyhead.action.ACTION_UPLOAD";
+    private static final String USER_EMAIL = "Email";
+    private static final String BODY = "Body";
+
     private LibraryDataSource datasource;
 
 
@@ -61,9 +63,11 @@ public class SyncUserItems extends IntentService {
      * @see IntentService
      */
     // TODO: Customize helper method
-    public static void startActionUpload(Context context, String param1) {
+    public static void startActionUpload(Context context, String userEmail, String url) {
         Intent intent = new Intent(context, SyncUserItems.class);
-        intent.putExtra(USER_EMAIL, param1);
+        intent.setAction(ACTION_UPLOAD);
+        intent.putExtra(USER_EMAIL, userEmail);
+        intent.putExtra(BODY, url);
         context.startService(intent);
     }
 
@@ -79,8 +83,9 @@ public class SyncUserItems extends IntentService {
                 final String param1 = intent.getStringExtra(USER_EMAIL);
                 handleActionDownload(param1);
             } else if (ACTION_UPLOAD.equals(action)) {
-                final String param1 = intent.getStringExtra(USER_EMAIL);
-                handleActionUpload(param1);
+                final String userEmail = intent.getStringExtra(USER_EMAIL);
+                final String url = intent.getStringExtra(BODY);
+                handleActionUpload(userEmail, url);
             }
         }
     }
@@ -95,14 +100,14 @@ public class SyncUserItems extends IntentService {
         HttpURLConnection urlConnection = null;
         URL urlObject = null;
         try {
-            Log.i("SyncUserItems: ", "inside Try");
-            urlObject = new URL(("http://cssgate.insttech.washington.edu/~_450bteam14/library.php?useritems=you@uw.edu"));
+            //Log.i("SyncUserItems: ", "inside Try");
+            urlObject = new URL(("http://cssgate.insttech.washington.edu/~_450bteam14/library.php?useritems="+param1));
             urlConnection = (HttpURLConnection) urlObject.openConnection();
-            Log.i("SyncUserItems: ", "After URL Connection");
+            //Log.i("SyncUserItems: ", "After URL Connection");
             InputStream content = urlConnection.getInputStream();
-            Log.i("SyncUserItems: ", "After input stream");
+            //Log.i("SyncUserItems: ", "After input stream");
             BufferedReader buffer = new BufferedReader(new InputStreamReader(content));
-            Log.i("SyncUserItems: ", "After buffer read.");
+            //Log.i("SyncUserItems: ", "After buffer read.");
             String s = "";
             while ((s = buffer.readLine()) != null) {
                  result += s;
@@ -110,9 +115,10 @@ public class SyncUserItems extends IntentService {
             JSONArray arr = new JSONArray(result);
             datasource = new LibraryDataSource(this);
             datasource.open();
+            datasource.upgrade();
             for(int i = 0; i < arr.length(); i++) {
                 JSONObject obj = arr.getJSONObject(i);
-                datasource.createLibItem(obj.getString("title"), 5);
+                datasource.createLibItem(obj.getString("title"), obj.getInt("position"), obj.getString("body"));
             }
 
         } catch (MalformedURLException e) {
@@ -132,8 +138,32 @@ public class SyncUserItems extends IntentService {
      * Handle action Baz in the provided background thread with the provided
      * parameters.
      */
-    private void handleActionUpload(String param1) {
-        // TODO: Handle action Baz
-        throw new UnsupportedOperationException("Not yet implemented");
+    private void handleActionUpload(String userEmail, String url) {
+        Log.i("SyncUserItemsUpload: ", "Success! Inside handleActionDownload"+ userEmail);
+        String result = "";
+        HttpURLConnection urlConnection = null;
+        URL urlObject = null;
+        try {
+            Log.i("SyncUserItemsUpload: ", "inside Upload Try");
+
+            urlObject = new URL((url));
+            urlConnection = (HttpURLConnection) urlObject.openConnection();
+            Log.i("SyncUserItemsUpload: ", "After URL Connection");
+            InputStream content = urlConnection.getInputStream();
+            Log.i("SyncUserItemsUpload: ", "After input stream");
+            BufferedReader buffer = new BufferedReader(new InputStreamReader(content));
+            Log.i("SyncUserItemsUpload: ", "After buffer read.");
+            String s = "";
+            while ((s = buffer.readLine()) != null) {
+                result += s;
+            }
+
+        } catch (MalformedURLException e) {
+            Log.i("SyncUserItemsUpload: ", "Malformed URL Exception " + e);
+            e.printStackTrace();
+        } catch (IOException e) {
+            Log.i("SyncUserItemsUpload: ", "IOException " + e);
+            e.printStackTrace();
+        }
     }
 }
