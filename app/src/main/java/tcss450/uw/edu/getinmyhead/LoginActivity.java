@@ -12,9 +12,11 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
@@ -41,6 +43,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -99,6 +102,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+    private CheckBox checkBox;
+    public static final String PREFS_NAME = "LOGIN_PREFS";
+    private SharedPreferences loginSettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,6 +140,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+        loginSettings = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+   //     loginSettings =  PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        if(loginSettings.getBoolean(getString(R.string.stored_login_info), true) ){
+            // Store values at the time of the login attempt.
+            mEmailView.setText(loginSettings.getString(getString(R.string.user_email),null));
+            mPasswordView.setText(loginSettings.getString(getString(R.string.user_password),null));
+        }
+        checkBox = (CheckBox) findViewById(R.id.checkBox_store_login_info);
+
     }
 
     private void populateAutoComplete() {
@@ -236,6 +251,19 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
+            loginSettings = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = loginSettings.edit();
+            if (checkBox.isChecked()) {
+
+
+                editor.putBoolean(getString(R.string.stored_login_info), true);
+                editor.putString(getString(R.string.user_email), email);
+                editor.putString(getString(R.string.user_password), password);
+
+            }else{
+                editor.putBoolean(getString(R.string.stored_login_info), false);
+            }
+            editor.commit();
             showProgress(true);
             mAuthTask = new UserLoginTask(email, password);
             mAuthTask.execute((Void) null);
@@ -433,6 +461,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 i.putExtra(getString(R.string.user_email), this.mEmail);
                 i.putExtra(getString(R.string.user_password), this.mPassword);
                 startActivity(i);
+                finish();
             } else {
                 if (errorType.contains("email")) {
                     if( errorType.contains("email")){
