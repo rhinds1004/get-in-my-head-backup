@@ -1,5 +1,8 @@
-/*
- * Copyright (c) 2017.  $author
+/**
+ * Created by Robert Hinds on .
+ *
+ * TCSS 450
+ *
  */
 
 package tcss450.uw.edu.getinmyhead;

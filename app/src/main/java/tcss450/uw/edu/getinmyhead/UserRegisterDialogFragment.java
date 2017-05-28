@@ -14,6 +14,8 @@ import android.support.v4.app.DialogFragment;
 
 /**
  * Created by hinds on 5/10/2017.
+ * An alert dialog telling the user the entered email was not found on the authentication server.
+ * Asks if the user would like to register or go back to the previous screen.
  */
 
 public class UserRegisterDialogFragment extends DialogFragment {
@@ -54,7 +56,7 @@ public class UserRegisterDialogFragment extends DialogFragment {
 
                     }
                 })
-                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.go_back, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //return to login screen.

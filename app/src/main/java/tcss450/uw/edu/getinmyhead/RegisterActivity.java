@@ -4,8 +4,15 @@
 
 package tcss450.uw.edu.getinmyhead;
 
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,11 +34,10 @@ import java.net.URLEncoder;
 
 public class RegisterActivity extends AppCompatActivity {
     final String ADD_USER_URL = "http://cssgate.insttech.washington.edu/~hindsr/Android/adduser.php?";
-
-   EditText editTextUserName;
-   EditText editTextUserPassword;
+    EditText editTextUserName;
+    EditText editTextUserPassword;
     Button submitButton;
-    String finalResult = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,19 +50,7 @@ public class RegisterActivity extends AppCompatActivity {
         this.submitButton = (Button) findViewById(R.id.button_submit);
         submitButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                String result = addUser(ADD_USER_URL);
-                    if(finalResult.contains("success")) {
-                        Intent i = new Intent(RegisterActivity.this, LibraryDatabaseActivity.class);
-                        i.putExtra(getString(R.string.user_email), editTextUserName.getText().toString());
-                        i.putExtra(getString(R.string.user_password), editTextUserPassword.getText().toString());
-                        Toast msg = Toast.makeText(getBaseContext(), finalResult, Toast.LENGTH_LONG);
-                        msg.show();
-                        startActivity(i);
-                    }else{
-                        Toast msg = Toast.makeText(getBaseContext(), finalResult, Toast.LENGTH_LONG);
-                        msg.show();
-                    }
-              //  finalResult = "";
+                addUser(ADD_USER_URL);
             }
         } );
     }
@@ -65,10 +59,11 @@ public class RegisterActivity extends AppCompatActivity {
     /**
      * This method builds a http url string
      *
-     * @return http login url on successful string creation or error string if unsuccessful
+     * @return http login url on successful string creation
+     * @throws buildLoginURLException
      * @author Robert Hinds
      */
-    private String buildLoginURL(String URL) {
+    private String buildLoginURL(String URL) throws buildLoginURLException {
         StringBuilder sb = new StringBuilder(URL);
 
         try {
@@ -78,43 +73,44 @@ public class RegisterActivity extends AppCompatActivity {
 
             sb.append("&password=");
             sb.append(URLEncoder.encode(this.editTextUserPassword.getText().toString(), "UTF-8"));
-
             Log.i("login url", sb.toString());
-
         } catch (Exception e) {
-            return getString(R.string.error_in_url) + e.getMessage();
+            throw new buildLoginURLException(getString(R.string.error_in_url) + e.getMessage());
         }
         return sb.toString();
     }
 
     /**
      * Method to add a user to the remote database
+     * Checks network connection and displays an error message if a network isn't available.
+     * Displays an error message if buildLoginUrl method is unsuccessful.
      *
      * @param url http url string
-     * @return result of the add user task
+     * @modified 5/27/2017 Robert Hinds
+     *
      */
-    private String addUser(String url) {
-        String loginURL = buildLoginURL(url);
-        String result = "";
+    private void addUser(String url) {
+        ConnectivityManager connMgr = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            try {
+                String loginURL = buildLoginURL(url);
+                Log.i("login url", loginURL);
+                RegisterActivity.AddUserTask task = new RegisterActivity.AddUserTask();
+                task.execute(new String[]{loginURL.toString()});
 
-        Log.i("login url" , loginURL);
-            RegisterActivity.AddUserTask task = new RegisterActivity.AddUserTask();
-            task.execute(new String[]{loginURL.toString()});
-
-/*                Toast msg = Toast.makeText(getBaseContext(), finalResult, Toast.LENGTH_LONG);
+            } catch (buildLoginURLException e) {
+                e.printStackTrace();
+                Toast msg = Toast.makeText(getBaseContext(), e.toString(), Toast.LENGTH_LONG);
                 msg.show();
-                result = getString(R.string.error_in_url);
-            finalResult = "";*/
-
-        //currently does not check if the the user was successfully added.
-        // task.getStatus();
-/*        try {
-           result = task.get();
-        }catch(Exception e){
-
-        }*/
-        return result;
+            }
+        } else {
+            Toast.makeText(this, "No network connection available. Cannot authenticate user",
+                    Toast.LENGTH_SHORT) .show();
+        }
     }
+
 
     /**
      * Represents an asynchronous add user to the remote database task
@@ -123,8 +119,6 @@ public class RegisterActivity extends AppCompatActivity {
      * @version 1.0
      */
     public class AddUserTask extends AsyncTask<String, Void, String> {
-
-
 
         @Override
         protected void onPreExecute() {
@@ -139,15 +133,12 @@ public class RegisterActivity extends AppCompatActivity {
                 try {
                     URL urlObject = new URL(url);
                     urlConnection = (HttpURLConnection) urlObject.openConnection();
-
                     InputStream content = urlConnection.getInputStream();
-
                     BufferedReader buffer = new BufferedReader(new InputStreamReader(content));
                     String s = "";
                     while ((s = buffer.readLine()) != null) {
                         response += s;
                     }
-
                 } catch (Exception e) {
                     response = "Unable to add user, Reason: "
                             + e.getMessage();
@@ -156,7 +147,6 @@ public class RegisterActivity extends AppCompatActivity {
                         urlConnection.disconnect();
                 }
             }
-            finalResult = response;
             return response;
         }
 
@@ -164,37 +154,51 @@ public class RegisterActivity extends AppCompatActivity {
         /**
          * It checks to see if there was a problem with the URL(Network) which is when an
          * exception is caught. It tries to call the parse Method and checks to see if it was successful.
+         * If successful starts the User's Library Database
          * If not, it displays the exception.
          *
          * @param result
+         * @modified 5/27/2017 Robert Hinds
          */
         @Override
         protected void onPostExecute(String result) {
             // Something wrong with the network or the URL.
+            String status = "fail";
 
             try {
                 JSONObject jsonObject = new JSONObject(result);
-                String status = (String) jsonObject.get("result");
+                 status = (String) jsonObject.get("result");
 
                 if (status.equals("success")) {
-             /*      Toast.makeText(getApplicationContext(), "User successfully added!"
-                            , Toast.LENGTH_LONG)
-                            .show();*/
-                    finalResult = "User successfully added!";
+                   Toast.makeText(getApplicationContext(), "User successfully added!",
+                           Toast.LENGTH_LONG).show();
+
+                        Intent i = new Intent(RegisterActivity.this, LibraryDatabaseActivity.class);
+                        i.putExtra(getString(R.string.user_email), editTextUserName.getText().toString());
+                        i.putExtra(getString(R.string.user_password), editTextUserPassword.getText().toString());
+                        startActivity(i);
                 } else {
-/*                    Toast.makeText(getApplicationContext(), "Failed to add: "
-                                    + jsonObject.get("error")
-                            , Toast.LENGTH_LONG)
-                            .show();*/
-                  finalResult = "Failed to add: " + jsonObject.get("error");
+                    Toast.makeText(getApplicationContext(), "Failed to add: "
+                                    + jsonObject.get("error"), Toast.LENGTH_LONG).show();
                 }
             } catch (JSONException e) {
-/*                Toast.makeText(getApplicationContext(), "Something wrong with the data" +
-                        e.getMessage(), Toast.LENGTH_LONG).show();*/
-             finalResult = "Something wrong with the data" + e.getMessage();
+                Toast.makeText(getApplicationContext(), "Something wrong with the data" +
+                        e.getMessage(), Toast.LENGTH_LONG).show();
             }
-
         }
 
     }
+
+    /**
+     * buildLoginURL's exception class
+     */
+    public class buildLoginURLException extends Exception {
+
+        public buildLoginURLException(String message){
+            super(message);
+        }
+
+    }
+
+
 }
