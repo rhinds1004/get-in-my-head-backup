@@ -35,4 +35,5 @@
     <string name="key_last_setting">last setting</string>
     <string name="key_item_text">item_text</string>
     <string name="go_back">Go Back</string>
+    <string name="stored_login_info">stored_login_info</string>
 </resources>
