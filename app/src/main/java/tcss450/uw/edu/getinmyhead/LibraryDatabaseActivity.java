@@ -133,15 +133,19 @@ public class LibraryDatabaseActivity extends ListActivity {
             if (resultData != null) {
                 uri = resultData.getData();
                 try {
+                    datasource.open();
                     String body  = readTextFromUri(uri);
                     String title = (body.length() < 15) ? body : body.substring(0,14);
                     String url = "http://cssgate.insttech.washington.edu/~_450bteam14/library.php?email="+ myEmail + "&title=" + URLEncoder.encode(title, "UTF-8") +"&body=" + URLEncoder.encode(body, "UTF-8") + "&position=1";
                     Log.i("onActivityResult: ", url);
                     SyncUserItems.startActionUpload(LibraryDatabaseActivity.this, myEmail, url);
+                    datasource.createLibItem(title, 1, body);
+                    datasource.close();
+                    finish();
+                    startActivity(getIntent());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
 
             }
         }
@@ -198,8 +202,9 @@ public class LibraryDatabaseActivity extends ListActivity {
 
     @Override
     protected void onResume() {
-        datasource.open();
         super.onResume();
+        datasource.open();
+
     }
 
     @Override
