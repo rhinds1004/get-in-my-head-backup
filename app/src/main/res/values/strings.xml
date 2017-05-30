@@ -38,4 +38,5 @@
     <string name="stored_login_info">stored_login_info</string>
     <string name="submit">Submit</string>
     <string name="delete_item">Delete</string>
+    <string name="action_feedback">Feedback</string>
 </resources>

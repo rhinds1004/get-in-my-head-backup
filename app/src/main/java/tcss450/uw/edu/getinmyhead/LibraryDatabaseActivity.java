@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -54,8 +55,31 @@ public class LibraryDatabaseActivity extends ListActivity {
         datasource = new LibraryDataSource(this);
         datasource.open();
 
-         values = datasource.getAllLibItems();
+        values = datasource.getAllLibItems();
+        Toolbar myToolBar = (Toolbar) findViewById(R.id.toolbar_lib_db);
+        myToolBar.inflateMenu(R.menu.menu_reader);
+        myToolBar.setTitle(getString(R.string.app_name));
+        myToolBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
 
+                switch (menuItem.getItemId()){
+                    case R.id.action_feedback:
+                      //  String address[] = {"GiMHTeam@gmail.com"};
+                       // Toast.makeText(getApplicationContext(),"Share",Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(Intent.ACTION_SENDTO);
+                        intent.setData(Uri.parse("mailto:GiMHTeam@gmail.com")); // only email apps should handle this
+                       // intent.putExtra(Intent.EXTRA_EMAIL, address[0]);
+                        intent.putExtra(Intent.EXTRA_SUBJECT, "User Feedback!");
+                        if (intent.resolveActivity(getPackageManager()) != null) {
+                            startActivity(intent);
+                        }
+                        return true;
+                }
+
+                return false;
+            }
+        });
         // use the SimpleCursorAdapter to show the
         // elements in a ListView
         ArrayAdapter<LibItem> adapter = new ArrayAdapter<LibItem>(this,
@@ -78,32 +102,10 @@ public class LibraryDatabaseActivity extends ListActivity {
             }
         });
         registerForContextMenu(listView);
- /*        //long tap
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-               ArrayAdapter<LibItem> adapter = (ArrayAdapter<LibItem>) getListAdapter();
-                LibItem libItem = values.get(position);
-                libItem_position = position;
-                //TODO add logic so a dialog window pops up to (delete, edit or something) on long click on listitem.
-                Toast.makeText(getApplicationContext(), "Long click",
-                        Toast.LENGTH_SHORT).show();
-                //Log.i("Long Click: ", datasource.getSingleItem( (int)values.get(position).getId() ).getItemText());
 
-                datasource.deleteLibItem(libItem);
-                adapter.remove(libItem);
-                adapter.notifyDataSetChanged();
-                return true;
-            }
-        });*/
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_reader, menu);
-        return true;
-    }
+
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
