@@ -20,7 +20,7 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
-    <string name="add_new">Add New</string>
+    <string name="add_file">Add File</string>
     <string name="cancel">Cancel</string>
     <string name="register_new_account">Register!</string>
     <string name="user_email">userEmail</string>
@@ -36,4 +36,6 @@
     <string name="key_item_text">item_text</string>
     <string name="go_back">Go Back</string>
     <string name="stored_login_info">stored_login_info</string>
+    <string name="submit">Submit</string>
+    <string name="delete_item">Delete</string>
 </resources>

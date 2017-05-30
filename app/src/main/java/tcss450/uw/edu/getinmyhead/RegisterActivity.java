@@ -4,22 +4,17 @@
 
 package tcss450.uw.edu.getinmyhead;
 
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.support.v4.app.DialogFragment;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONException;
@@ -37,6 +32,7 @@ public class RegisterActivity extends AppCompatActivity {
     EditText editTextUserName;
     EditText editTextUserPassword;
     Button submitButton;
+    Button cancelButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,12 +43,21 @@ public class RegisterActivity extends AppCompatActivity {
         this.editTextUserPassword = (EditText)findViewById(R.id.edittext_user_password);
         this.editTextUserName.setText(b.getString(getString(R.string.user_email)));
         this.editTextUserPassword.setText(b.getString(getString(R.string.user_password)));
-        this.submitButton = (Button) findViewById(R.id.button_submit);
+        this.submitButton = (Button) findViewById(R.id.button_submit_reg);
+        this.cancelButton = (Button) findViewById(R.id.button_cancel_reg);
         submitButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 addUser(ADD_USER_URL);
             }
         } );
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(RegisterActivity.this, LoginActivity.class);
+                startActivity(i);
+                finish();
+            }
+        });
     }
 
 

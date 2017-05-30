@@ -28,12 +28,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".LibraryDatabaseActivity"
-            android:label="Library"/>
+        <activity android:name=".LibraryDatabaseActivity" />
         <activity android:name=".RegisterActivity" />
-        <activity
-            android:name=".ReaderActivity" />
-
+        <activity android:name=".ReaderActivity" />
         <activity android:name=".ListFilesActivity" />
 
         <service

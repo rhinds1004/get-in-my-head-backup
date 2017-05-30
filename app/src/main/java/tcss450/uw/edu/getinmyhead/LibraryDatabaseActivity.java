@@ -14,6 +14,10 @@ import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -41,6 +45,7 @@ public class LibraryDatabaseActivity extends ListActivity {
     private LibraryDataSource datasource;
     private List<LibItem> values;
     private String myEmail;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,7 +69,7 @@ public class LibraryDatabaseActivity extends ListActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-                //TODO this probably needs to be worked on.
+
                 Intent i = new Intent(LibraryDatabaseActivity.this, ReaderActivity.class);
                 i.putExtra(getString(R.string.key_last_setting), values.get(position).getLastSetting());
                 i.putExtra(getString(R.string.key_item_text), values.get(position).getItemText());
@@ -72,13 +77,14 @@ public class LibraryDatabaseActivity extends ListActivity {
 
             }
         });
-
-        //long tap
+        registerForContextMenu(listView);
+ /*        //long tap
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                ArrayAdapter<LibItem> adapter = (ArrayAdapter<LibItem>) getListAdapter();
+               ArrayAdapter<LibItem> adapter = (ArrayAdapter<LibItem>) getListAdapter();
                 LibItem libItem = values.get(position);
+                libItem_position = position;
                 //TODO add logic so a dialog window pops up to (delete, edit or something) on long click on listitem.
                 Toast.makeText(getApplicationContext(), "Long click",
                         Toast.LENGTH_SHORT).show();
@@ -89,9 +95,41 @@ public class LibraryDatabaseActivity extends ListActivity {
                 adapter.notifyDataSetChanged();
                 return true;
             }
-        });
+        });*/
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_reader, menu);
+        return true;
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.reader_longclick, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        switch (item.getItemId()) {
+
+            case R.id.delete:
+                ArrayAdapter<LibItem> adapter = (ArrayAdapter<LibItem>) getListAdapter();
+                LibItem libItem = values.get(info.position);
+                datasource.deleteLibItem(libItem);
+                adapter.remove(libItem);
+                adapter.notifyDataSetChanged();
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
 
     private static final int READ_REQUEST_CODE = 42;
     /**
@@ -188,13 +226,6 @@ public class LibraryDatabaseActivity extends ListActivity {
 
                 //adapter.add(libItem);
                 performFileSearch();
-                break;
-            case R.id.delete_libitem:
-                if (getListAdapter().getCount() > 0) {
-                    libItem = (LibItem) getListAdapter().getItem(0); // this is determining what is getting deleted.
-                    datasource.deleteLibItem(libItem);
-                    adapter.remove(libItem);
-                }
                 break;
         }
         adapter.notifyDataSetChanged();
